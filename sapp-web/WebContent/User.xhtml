@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>Cribcaged Bet App</title>
+</h:head>
+<h:body>
+	<h3>User</h3>
+	<p:growl id="growl" />
+	<h:form id="form">
+		<p:dataTable id="dataList" var="user" widgetVar="userList"
+			value="#{userBean.elements}" paginatorPosition="bottom"
+			emptyMessage="No user records were found." selectionMode="multiple"
+			selection="#{userBean.selectedElements}" paginator="true"
+			paginatorAlwaysVisible="true" rows="25" pageLinks="5"
+			paginatorTemplate="#{userBean.paginatorTemplate}"
+			rowsPerPageTemplate="#{userBean.rowsPerPageTemplate}"
+			rowKey="#{user.id}">
+
+			<p:ajax event="rowSelect" listener="#{userBean.onRowSelect}"
+				update=":buttonForm" global="false" />
+			<p:ajax event="rowUnselect" listener="#{userBean.onRowUnselect}"
+				update=":buttonForm" global="false" />
+			<p:ajax event="filter" update=":buttonForm" global="false" />
+			<p:ajax event="sort" update=":buttonForm" global="false" />
+
+			<p:column headerText="Username" sortBy="#{user.username}"
+				filterBy="#{user.username}" filterMatchMode="contains">
+				<h:outputText value="#{user.username}" />
+			</p:column>
+			<p:column headerText="First name" sortBy="#{user.firstname}"
+				filterBy="#{user.firstname}" filterMatchMode="contains">
+				<h:outputText value="#{user.firstname}" />
+			</p:column>
+			<p:column headerText="Last name" sortBy="#{user.lastname}"
+				filterBy="#{user.lastname}" filterMatchMode="contains">
+				<h:outputText value="#{user.lastname}" />
+			</p:column>
+			<p:column headerText="E-mail" sortBy="#{user.email}"
+				filterBy="#{user.email}" filterMatchMode="contains">
+				<h:outputText value="#{user.email}" />
+			</p:column>
+		</p:dataTable>
+	</h:form>
+	<h:form id="buttonForm">
+		<p:commandButton id="addButton" value="Add"
+			actionListener="#{userBean.createElement}"
+			oncomplete="PF('detailDialog').show(); return false;"
+			update=":detailPanel">
+		</p:commandButton>
+		<p:commandButton id="editButton" value="Edit"
+			disabled="#{userBean.selectedElementCount != 1}"
+			actionListener="#{userBean.selectElement}"
+			oncomplete="PF('detailDialog').show(); return false;"
+			update=":detailPanel">
+		</p:commandButton>
+		<p:commandButton id="deleteButton" value="Delete"
+			disabled="#{userBean.selectedElementCount == 0}"
+			actionListener="#{userBean.batchDelete}"
+			oncomplete="PF('userList').filter()"
+			update=":growl :detailPanel">
+		</p:commandButton>
+	</h:form>
+
+	<p:outputPanel id="detailPanel" layout="block">
+		<p:dialog id="detailDialog" widgetVar="detailDialog"
+			header="Add/edit user" modal="true" width="400">
+			<h:form id="detailForm">
+				<p:panel>
+					<h:panelGrid columns="2">
+						<h:outputLabel for="username" styleClass="required" value="Username">
+						</h:outputLabel>
+						<p:inputText id="username" required="true" label="Username"
+							value="#{userBean.currentElement.username}" maxlength="50">
+						</p:inputText>
+						
+						<h:outputLabel for="password" styleClass="required" value="Password">
+						</h:outputLabel>
+						<p:password id="password" required="true" label="Password"
+							value="#{userBean.currentElement.password}" maxlength="50">
+						</p:password>
+						
+						<h:outputLabel for="firstname" styleClass="required" value="First name">
+						</h:outputLabel>
+						<p:inputText id="firstname" required="true" label="First name"
+							value="#{userBean.currentElement.firstname}" maxlength="50">
+						</p:inputText>
+						
+						<h:outputLabel for="lastname" styleClass="required" value="Last name">
+						</h:outputLabel>
+						<p:inputText id="lastname" required="true" label="Last name"
+							value="#{userBean.currentElement.lastname}" maxlength="50">
+						</p:inputText>
+						
+						<h:outputLabel for="email" styleClass="required" value="E-mail">
+						</h:outputLabel>
+						<p:inputText id="email" required="true" label="E-mail"
+							value="#{userBean.currentElement.email}" maxlength="50">
+						</p:inputText>
+					</h:panelGrid>
+				</p:panel>
+				<h:panelGroup id="buttonPanel" layout="block">
+					<p:commandButton id="dialogSaveButton" value="Save"
+						rendered="#{userBean.currentElement.id eq null}"
+						actionListener="#{userBean.add}"
+						oncomplete="handleDialogComplete(xhr, status, args)"
+						update=":growl" />
+					<p:commandButton id="dialogUpdateButton" value="Save"
+						rendered="#{userBean.currentElement.id ne null}"
+						actionListener="#{userBean.update}"
+						oncomplete="handleDialogComplete(xhr, status, args)"
+						update=":growl" />
+					<p:button value="Cancel"
+						onclick="PF('detailDialog').hide(); return false;" />
+				</h:panelGroup>
+			</h:form>
+		</p:dialog>
+	</p:outputPanel>
+	<script type="text/javascript">
+		function handleDialogComplete(xhr, status, args) {
+			if (!(args.actionFailed || args.validationFailed)) {
+				PF('detailDialog').hide();
+				PF('userList').filter();
+			}
+			return false;
+		}
+	</script>
+</h:body>
+</html>

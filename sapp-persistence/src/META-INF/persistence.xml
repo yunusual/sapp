@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="sapp-persistence">
+		<jta-data-source>jboss/jdbc/sapp</jta-data-source>
+		<class>com.cribcaged.sapp.persistence.entity.Content</class>
+		<class>com.cribcaged.sapp.persistence.entity.Movie</class>
+		<class>com.cribcaged.sapp.persistence.entity.MovieGenre</class>
+		<class>com.cribcaged.sapp.persistence.entity.Photo</class>
+		<class>com.cribcaged.sapp.persistence.entity.SystemUser</class>
+		<class>com.cribcaged.sapp.persistence.entity.UserComment</class>
+		<class>com.cribcaged.sapp.persistence.entity.UserRating</class>
+		
+		<shared-cache-mode>ALL</shared-cache-mode>
+		
+		<properties>
+			<property name="hibernate.enable_lazy_load_no_trans" value="true"/>
+			<property name="hibernate.cache.use_second_level_cache" value="true"/>
+			<property name="hibernate.cache.use_query_cache" value="true"/>
+		</properties>
+	</persistence-unit>
+</persistence>

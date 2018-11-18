@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<head>
+<link rel="stylesheet" href="screen.css" media="screen, projection" />
+</head>
+<body>
+	<ui:composition>
+		<h:form id="headerForm">
+			<h:panelGrid columns="4" styleClass="headerPanel"
+				columnClasses="twentyfive-percent, twentyfive-percent, twentyfive-percent, twentyfive-percent">
+				<h:outputLink styleClass="headerItem"
+					value="#{facesContext.externalContext.requestContextPath}/user/Dashboard.xhtml">
+				Fotoğraf
+			</h:outputLink>
+				<h:outputLink styleClass="headerItem"
+					value="#{facesContext.externalContext.requestContextPath}/user/Movie.xhtml">
+				Film
+			</h:outputLink>
+				<h:outputLink styleClass="headerItem"
+					value="#{facesContext.externalContext.requestContextPath}/user/Profile.xhtml">
+				Profil
+			</h:outputLink>
+				<h:commandLink styleClass="headerItem" action="#{userBean.logout}">
+				Çıkış
+			</h:commandLink>
+			</h:panelGrid>
+		</h:form>
+	</ui:composition>
+</body>
+</html>
+
+

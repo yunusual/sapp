@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<f:view locale="#{loginBean.defaultLocale}">
+	<h:head>
+		<title>sApp - #{msgs['movie.title']}</title>
+		<link rel="shortcut icon" href="images/favicon.ico" />
+		<link rel="stylesheet" href="screen.css" media="screen, projection" />
+	</h:head>
+	<h:body styleClass="bodyStyle">
+		<div id="header" style="width: 100%;">
+			<ui:insert name="header">
+				<ui:include src="/templates/header.xhtml" />
+			</ui:insert>
+		</div>
+
+		<p:growl id="growl" />
+
+		<div class="container newContent">
+			<h:form id="newContentForm" enctype="multipart/form-data">
+				<div class="newContent">
+					<h:panelGrid id="newContentPanel" columns="1"
+						style="min-width: 400px;width: 400px;">
+						<p:outputLabel id="newContentLabel"
+							value="#{msgs['movie.newContent.label']}" />
+						<p:autoComplete id="newMovieInput"
+							value="#{movieBean.selectedMovie}" converter="#{movieConverter}"
+							completeMethod="#{movieBean.completeMovieTitle}" var="movie"
+							itemLabel="#{movie.title}" itemValue="#{movie}" maxResults="6">
+							<p:column>
+								<h:graphicImage url="#{movie.posterUrl}" width="50"
+									rendered="#{movie.posterUrl ne null}" />
+								<h:graphicImage value="images/no_poster.png" width="50"
+									rendered="#{movie.posterUrl eq null}" />
+							</p:column>
+
+							<p:column>
+								<h:outputText value="#{movie.title} (#{movie.year})" />
+							</p:column>
+							<p:ajax event="itemSelect" listener="#{movieBean.onMovieSelect}"
+								update=":growl :newContentForm:newMovieDetails :newContentForm:shareButton" />
+						</p:autoComplete>
+					</h:panelGrid>
+				</div>
+				<div style="text-align: left; display: inline-block;">
+					<p:outputPanel id="newMovieDetails"
+						style="padding-top: 20px;display: -webkit-box;">
+						<h:graphicImage url="#{movieBean.selectedMovie.posterUrl}"
+							width="200" rendered="#{movieBean.selectedMovie ne null}" />
+						<p:spacer width="20" />
+						<p:panelGrid id="newMovieDetailsGrid" columns="2"
+							styleClass="gridPanelNoBorder"
+							columnClasses="twenty-percent, eighty-percent"
+							rendered="#{movieBean.selectedMovie ne null}">
+
+							<p:outputLabel value="#{msgs['movie.newContent.description']}" />
+							<p:inputTextarea id="newContentInput"
+								value="#{movieBean.contentDescription}" rows="2"
+								styleClass="newContentInput" />
+
+							<p:outputLabel value="#{msgs['movie.newContent.title']}" />
+							<p:outputLabel value="#{movieBean.selectedMovie.title}"
+								readonly="true" />
+
+							<p:outputLabel value="#{msgs['movie.newContent.year']}" />
+							<p:outputLabel value="#{movieBean.selectedMovie.year}" />
+
+							<p:outputLabel value="#{msgs['movie.newContent.runtime']}" />
+							<p:outputLabel
+								value="#{movieBean.getRuntime(movieBean.selectedMovie.runtime)}" />
+
+							<p:outputLabel value="#{msgs['movie.newContent.director']}" />
+							<p:outputLabel value="#{movieBean.selectedMovie.director}" />
+
+							<p:outputLabel value="#{msgs['movie.newContent.actors']}" />
+							<p:outputLabel value="#{movieBean.selectedMovie.actors}" />
+
+							<p:outputLabel value="#{msgs['movie.newContent.genres']}"
+								for="genres" />
+							<p:autoComplete id="genres" multiple="true"
+								value="#{movieBean.selectedGenres}"
+								completeMethod="#{movieBean.completeGenre}" var="genre"
+								itemLabel="#{movieBean.getGenreLabel(genre)}"
+								itemValue="#{genre}" converter="#{genreConverter}"
+								forceSelection="true"
+								style="min-width:300px; width: 300px; background-color: transparent;">
+								<p:column>
+									<h:outputText value="#{movieBean.getGenreLabel(genre)}" />
+								</p:column>
+							</p:autoComplete>
+
+							<p:outputLabel value="#{msgs['movie.newContent.language']}" />
+							<p:outputLabel value="#{movieBean.selectedMovie.language}" />
+
+							<p:outputLabel value="#{msgs['movie.newContent.country']}" />
+							<p:outputLabel value="#{movieBean.selectedMovie.country}" />
+
+							<p:outputLabel value="#{msgs['movie.newContent.imdbRating']}" />
+							<p:outputLabel
+								value="#{movieBean.getImdbRating(movieBean.selectedMovie.imdbRating, movieBean.selectedMovie.imdbVotes)}" />
+
+							<p:outputLabel value="#{msgs['movie.newContent.plot']}" />
+							<p:inputTextarea value="#{movieBean.selectedMovie.plot}"
+								readonly="true"
+								style="min-width: 500px; width: 500px; background-color: transparent;" />
+
+							<h:outputLink
+								value="http://www.imdb.com/title/#{movieBean.selectedMovie.imdbReference}"
+								target="_blank">#{msgs['movie.newContent.imdbLink']}</h:outputLink>
+
+						</p:panelGrid>
+					</p:outputPanel>
+				</div>
+				<div style="text-align: center;">
+					<p:commandButton id="shareButton" styleClass="loginButton"
+						disabled="#{movieBean.selectedMovie eq null}"
+						value="#{msgs['movie.button.share']}" process="newContentForm"
+						action="#{movieBean.share}" ajax="false" update=":growl :dataList" />
+				</div>
+			</h:form>
+			<div class="container feed">
+				<p:dataTable id="dataList" var="movie" widgetVar="movieList"
+					value="#{movieBean.elements}" paginatorPosition="bottom"
+					emptyMessage="#{msgs['movie.noRecordsFound']}"
+					selectionMode="single" selection="#{movieBean.selectedElements}"
+					paginator="true" paginatorAlwaysVisible="false" rows="25"
+					pageLinks="5" paginatorTemplate="#{movieBean.paginatorTemplate}"
+					rowsPerPageTemplate="#{movieBean.rowsPerPageTemplate}"
+					rowKey="#{movie.id}" styleClass="borderless">
+
+					<p:ajax event="rowSelect" listener="#{movieBean.onRowSelect}"
+						global="false" />
+					<p:ajax event="rowUnselect" listener="#{movieBean.onRowUnselect}"
+						global="false" />
+					<p:ajax event="filter" global="false" />
+					<p:ajax event="sort" global="false" />
+
+					<p:column>
+						<p:panelGrid columns="1" styleClass="contentGrid">
+							<p:outputPanel styleClass="contentTopPanel">
+								<p:panelGrid columns="2" styleClass="contentGrid"
+									columnClasses="fifty-percent, fifty-percent">
+									<p:panelGrid columns="2" styleClass="contentNameGrid"
+										columnClasses="twenty-percent, eighty-percent">
+										<p:graphicImage value="#{imageBean.profileImage}" width="50px">
+											<f:param name="userId" value="#{photo.content.systemUser.id}" />
+											<f:param name="profilePhotoFileName"
+												value="#{movie.content.systemUser.profilePhoto}" />
+										</p:graphicImage>
+										<p:panelGrid columns="2" styleClass="contentGridTop">
+											<h:outputLabel style="color: #0A9656;"
+												value="#{movie.content.systemUser.firstname} #{movie.content.systemUser.lastname}" />
+											<p:tooltip id="contentTimeAgoTooltip" for="contentTimeAgo"
+												value="#{movieBean.getTime(movie.content.createTimestamp)}"
+												trackMouse="true" />
+											<h:outputLabel id="contentTimeAgo"
+												style="font-size: 15px;color: #0A9656;"
+												value="#{movieBean.getTimeAgo(movie.content.createTimestamp)}" />
+										</p:panelGrid>
+									</p:panelGrid>
+									<p:spacer width="10">
+									</p:spacer>
+								</p:panelGrid>
+							</p:outputPanel>
+							<p:outputPanel id="descriptionPanel"
+								rendered="#{movie.content.description ne null}"
+								style="padding-bottom: 30px; padding-top: 10px;">
+								<h:outputText value="#{movie.content.description}"
+									style="padding-left: 10px; display: block; font-size: 20px; float: left;" />
+							</p:outputPanel>
+							<p:panelGrid style="text-align: left; display: inline-block; padding-top: 10px;" columns="3">
+								<h:graphicImage url="#{movie.posterUrl}" width="200"
+									rendered="#{movie.posterUrl ne null}" style="padding-right: 20px;"/>
+								<h:graphicImage value="images/no_poster.png" width="200"
+									rendered="#{movie.posterUrl eq null}" style="padding-right: 20px;"/>
+								<p:panelGrid id="movieDetailsGrid" columns="2"
+									styleClass="gridPanelNoBorder"
+									columnClasses="twenty-percent, eighty-percent">
+									<p:outputLabel value="#{msgs['movie.newContent.title']}" style="font-size: 16px; color: #9A2C2C;" />
+									<p:outputLabel value="#{movie.title}"
+										readonly="true" />
+		
+									<p:outputLabel value="#{msgs['movie.newContent.year']}" style="font-size: 16px; color: #9A2C2C;" />
+									<p:outputLabel value="#{movie.year}" />
+		
+									<p:outputLabel value="#{msgs['movie.newContent.runtime']}" style="font-size: 16px; color: #9A2C2C;" />
+									<p:outputLabel
+										value="#{movieBean.getRuntime(movie.runtime)}" />
+		
+									<p:outputLabel value="#{msgs['movie.newContent.director']}" style="font-size: 16px; color: #9A2C2C;" />
+									<p:outputLabel value="#{movie.director}" />
+		
+									<p:outputLabel value="#{msgs['movie.newContent.actors']}" style="font-size: 16px; color: #9A2C2C;" />
+									<p:outputLabel value="#{movie.actors}" />
+		
+									<p:outputLabel value="#{msgs['movie.newContent.genres']}" style="font-size: 16px; color: #9A2C2C;" />
+									<p:outputLabel value="#{movieBean.getMovieGenres(movie)}" />
+		
+									<p:outputLabel value="#{msgs['movie.newContent.language']}" style="font-size: 16px; color: #9A2C2C;" />
+									<p:outputLabel value="#{movie.language}" />
+		
+									<p:outputLabel value="#{msgs['movie.newContent.country']}" style="font-size: 16px; color: #9A2C2C;" />
+									<p:outputLabel value="#{movie.country}" />
+		
+									<p:outputLabel value="#{msgs['movie.newContent.imdbRating']}" style="font-size: 16px; color: #9A2C2C;" />
+									<p:outputLabel
+										value="#{movieBean.getImdbRating(movie.imdbRating, movie.imdbVotes)}" />
+		
+									<p:outputLabel value="#{msgs['movie.newContent.plot']}" style="font-size: 16px; color: #9A2C2C;" />
+									<p:inputTextarea value="#{movie.plot}"
+										readonly="true"
+										style="min-width: 500px; width: 500px; background-color: transparent;" />
+		
+									<h:outputLink
+										value="http://www.imdb.com/title/#{movie.imdbReference}"
+										target="_blank"
+										style="color: #9A2C2C;">#{msgs['movie.newContent.imdbLink']}</h:outputLink>
+								</p:panelGrid>
+							</p:panelGrid>
+						</p:panelGrid>
+						<p:outputPanel id="likePanel"
+							rendered="#{not empty movie.content.userLikes or not empty movie.content.userRatings}"
+							style="padding-top: 20px; text-align: left;">
+							<h:outputText value="#{movieBean.getWatchers(movie)}"
+								escape="false"
+								style="padding-left: 10px; display: block; font-size: 16px; float: left;" />
+							<h:outputText value="#{movieBean.getRatings(movie)}"
+								style="padding-left: 10px; display: block; font-size: 16px; float: right;" />
+						</p:outputPanel>
+						<h:form id="likeRateForm">
+							<p:outputPanel style="padding: 10px;">
+								<p:commandLink id="rateButton"
+									disabled="#{movieBean.rateEnabled(movie)}"
+									action="#{movieBean.setCurrentMovie(movie)}"
+									oncomplete="PF('rateDialog').show()" process="likeRateForm"
+									global="true">
+									<h:graphicImage value="images/rate.png" width="45px" />
+								</p:commandLink>
+							</p:outputPanel>
+						</h:form>
+						<p:outputPanel id="commentPanel"
+							rendered="#{not empty movie.content.userComments}"
+							style="padding-left: 25px;">
+							<p:dataList id="commentList" type="definition"
+								value="#{movie.content.userComments}" var="comment">
+								<p:panelGrid columns="2" styleClass="commentGrid"
+									columnClasses="twenty-percent, eighty-percent">
+									<p:panelGrid columns="1" styleClass="commentGrid">
+										<p:outputPanel>
+											<p:graphicImage value="#{imageBean.profileImage}"
+												width="30px" style="vertical-align: middle;">
+												<f:param name="profilePhotoFileName"
+													value="#{comment.systemUser.profilePhoto}" />
+											</p:graphicImage>
+											<p:outputLabel
+												style="padding-left: 5px;vertical-align: middle; font-size: 15px;color: #A95B17;"
+												value="#{comment.systemUser.firstname} #{comment.systemUser.lastname}" />
+										</p:outputPanel>
+										<p:outputLabel style="font-size: 10px;color: #A95B17;"
+											value="#{movieBean.getTimeAgo(comment.createTimestamp)}" />
+									</p:panelGrid>
+									<h:outputText value="#{comment.comment}"
+										style="padding-left: 10px; display: block; font-size: 15px;" />
+								</p:panelGrid>
+								<hr
+									style="width: 900px; height: 1px; background: #F1BC96; border: none;" />
+							</p:dataList>
+						</p:outputPanel>
+						<h:form id="commentForm" style="padding-left: 25px; padding-bottom: 20px;">
+							<p:panelGrid id="newCommentPanel" columns="2"
+								styleClass="commentGrid"
+								columnClasses="eightyfive-percent, fifteen-percent">
+								<p:outputPanel>
+									<p:inputTextarea id="newCommentInput"
+										value="#{movieBean.comment}" cols="3"
+										styleClass="newCommentInput" />
+									<p:watermark for="newCommentInput"
+										value="#{msgs['dashboard.newComment.comment']}"
+										id="watermarkComment" />
+								</p:outputPanel>
+								<p:commandButton id="commentButton" styleClass="loginButton"
+									value="#{msgs['dashboard.button.comment']}"
+									action="#{movieBean.comment(movie)}" process="commentForm"
+									update=":growl :dataList" />
+							</p:panelGrid>
+						</h:form>
+					</p:column>
+				</p:dataTable>
+			</div>
+		</div>
+
+		<h:form id="rateForm">
+			<p:outputPanel>
+				<p:dialog id="rateDialog" widgetVar="rateDialog" modal="true"
+					width="300px" header="#{msgs['dashboard.rate.dialog.header']}"
+					style="background-color: beige;">
+					<div
+						style="text-align: center; vertical-align: middle; white-space: pre-wrap;">
+						<p:outputLabel value="#{msgs['dashboard.rate.dialog.rating']}"
+							style="padding-right: 20px;" />
+						<p:selectOneMenu required="true" value="#{movieBean.rating}"
+							styleClass="selectOneMenuBackground"
+							panelStyleClass="selectOneMenuBackgroundPanel"
+							label="#{msgs['dashboard.rate.dialog.rating']}">
+							<f:selectItem itemLabel="" itemValue="0" noSelectionOption="true" />
+							<f:selectItem itemLabel="10" itemValue="10" />
+							<f:selectItem itemLabel="9" itemValue="9" />
+							<f:selectItem itemLabel="8" itemValue="8" />
+							<f:selectItem itemLabel="7" itemValue="7" />
+							<f:selectItem itemLabel="6" itemValue="6" />
+							<f:selectItem itemLabel="5" itemValue="5" />
+							<f:selectItem itemLabel="4" itemValue="4" />
+							<f:selectItem itemLabel="3" itemValue="3" />
+							<f:selectItem itemLabel="2" itemValue="2" />
+							<f:selectItem itemLabel="1" itemValue="1" />
+						</p:selectOneMenu>
+					</div>
+					<p:panelGrid columns="2" styleClass="gridPanelNoBorder">
+						<p:commandButton id="proceedButton" styleClass="loginButton"
+							value="#{msgs['dashboard.rate.dialog.rateButton']}"
+							action="#{movieBean.rate}" update=":growl :dataList"
+							oncomplete="handleRateDialogComplete(xhr, status, args);" />
+						<p:commandButton id="cancelButton" styleClass="loginButton"
+							value="#{msgs['dashboard.rate.dialog.cancelButton']}"
+							label="#{msgs['dashboard.rate.dialog.cancelButton']}"
+							onclick="PF('rateDialog').hide();" />
+					</p:panelGrid>
+
+				</p:dialog>
+			</p:outputPanel>
+		</h:form>
+
+		<script type="text/javascript">
+			function handleRateDialogComplete(xhr, status, args) {
+				if (!(args.actionFailed || args.validationFailed)) {
+					PF('rateDialog').hide();
+				}
+				return false;
+			}
+		</script>
+	</h:body>
+</f:view>
+</html>

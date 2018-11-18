@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<f:view locale="#{loginBean.defaultLocale}">
+	<h:head>
+		<title>sApp - #{msgs['login.title']}</title>
+		<link rel="stylesheet" href="screen.css" media="screen, projection" />
+		<link rel="shortcut icon" href="images/favicon.ico" />
+	</h:head>
+	<h:body>
+		<p:growl id="growl" />
+		<div class="container login">
+			<div class="login">
+				<h:form id="form">
+					<h:outputLink style="text-decoration: underline;"
+						value="#{facesContext.externalContext.requestContextPath}/Register.xhtml">
+						#{msgs['login.register']}
+					</h:outputLink>
+					<h:panelGrid columns="2" style="padding-top: 20px;">
+						<h:outputLabel for="username" style="padding-right: 10px;"
+							value="#{msgs['login.username']}" />
+						<p:inputText id="username" required="true"
+							style="background-color: #FFFDE7;"
+							label="#{msgs['login.username']}" value="#{loginBean.username}"
+							maxlength="50" />
+
+						<h:outputLabel for="password" styleClass="required"
+							value="#{msgs['login.password']}" />
+						<p:password id="password" required="true"
+							style="background-color: #FFFDE7;"
+							label="#{msgs['login.password']}" value="#{loginBean.password}"
+							maxlength="50" />
+					</h:panelGrid>
+					<p:commandButton id="loginButton"
+						value="#{msgs['login.button.login']}" action="#{loginBean.login}"
+						oncomplete="handleDialogComplete(xhr, status, args);"
+						update=":growl" styleClass="loginButton">
+					</p:commandButton>
+				</h:form>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			function handleDialogComplete(xhr, status, args) {
+				if (!(args.actionFailed || args.validationFailed)) {
+
+				}
+				return false;
+			}
+		</script>
+	</h:body>
+</f:view>
+</html>

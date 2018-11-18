@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<f:view locale="#{loginBean.defaultLocale}">
+	<h:head>
+		<title>sApp - #{msgs['register.title']}</title>
+		<link rel="stylesheet" href="screen.css" media="screen, projection" />
+		<link rel="shortcut icon" href="images/favicon.ico" />
+	</h:head>
+	<h:body>
+		<p:growl id="growl" />
+		<h:form id="form">
+			<div class="container register">
+				<div class="register">
+					<p:panelGrid columns="2" styleClass="gridPanelNoBorder">
+						<p:panelGrid columns="2" styleClass="gridPanelNoBorder">
+							<h:outputLabel for="username" style="padding-right: 10px;"
+								value="#{msgs['register.username']}" />
+							<p:inputText id="username" required="true"
+								style="background-color: #FFFDE7;"
+								label="#{msgs['register.username']}"
+								value="#{registerBean.newUser.username}" maxlength="50" />
+
+							<h:outputLabel for="password" style="padding-right: 10px;"
+								value="#{msgs['register.password']}" />
+							<p:password id="password" required="true"
+								style="background-color: #FFFDE7;"
+								label="#{msgs['register.password']}"
+								value="#{registerBean.newUser.password}" maxlength="50" />
+
+							<h:outputLabel for="firstname" style="padding-right: 10px;"
+								value="#{msgs['register.firstname']}" />
+							<p:inputText id="firstname" required="true"
+								style="background-color: #FFFDE7;"
+								label="#{msgs['register.firstname']}"
+								value="#{registerBean.newUser.firstname}" maxlength="50" />
+
+							<h:outputLabel for="lastname" style="padding-right: 10px;"
+								value="#{msgs['register.lastname']}" />
+							<p:inputText id="lastname" required="true"
+								style="background-color: #FFFDE7;"
+								label="#{msgs['register.lastname']}"
+								value="#{registerBean.newUser.lastname}" maxlength="50" />
+
+							<h:outputLabel for="email" style="padding-right: 10px;"
+								value="#{msgs['register.email']}" />
+							<p:inputText id="email" required="true"
+								style="background-color: #FFFDE7;"
+								label="#{msgs['register.email']}"
+								value="#{registerBean.newUser.email}" maxlength="50" />
+						</p:panelGrid>
+						<p:outputPanel id="profilePhotoPanel"
+							style="background-color: transparent;">
+							<p:outputLabel value="#{msgs['register.profilePhoto']}">
+							</p:outputLabel>
+							<p:fileUpload label="#{msgs['register.profilePhoto.select']}"
+								fileUploadListener="#{registerBean.handleFileUpload}"
+								mode="advanced" auto="true" update=":form:profilePhotoPanel"
+								allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
+							<p:outputPanel rendered="#{registerBean.fileName ne null}"
+								style="padding-top: 25px;">
+								<p:graphicImage id="profileImage"
+									value="#{imageBean.profileImage}" width="300px"
+									style="vertical-align: middle;">
+									<f:param name="profilePhotoFileName"
+										value="#{registerBean.fileName}" />
+								</p:graphicImage>
+							</p:outputPanel>
+						</p:outputPanel>
+					</p:panelGrid>
+
+					<div class="login">
+						<p:commandButton id="registerButton" widgetVar="registerButton"
+							value="#{msgs['register.button']}"
+							action="#{registerBean.register()}"
+							oncomplete="handleDialogComplete(xhr, status, args);"
+							update=":growl" styleClass="loginButton">
+						</p:commandButton>
+					</div>
+				</div>
+			</div>
+		</h:form>
+		<script type="text/javascript">
+			function handleDialogComplete(xhr, status, args) {
+				if (!(args.actionFailed || args.validationFailed)) {
+					PF('registerButton').disable();
+					window.setTimeout(
+							function() {
+								window.open('/sapp-web/', '_self');
+							}
+						, 3000);
+				}
+				return false;
+			}
+		</script>
+	</h:body>
+</f:view>
+</html>

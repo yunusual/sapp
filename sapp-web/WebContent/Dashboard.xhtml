@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<f:view locale="#{loginBean.defaultLocale}">
+	<h:head>
+		<title>sApp - #{msgs['dashboard.title']}</title>
+		<link rel="shortcut icon" href="images/favicon.ico" />
+		<link rel="stylesheet" href="screen.css" media="screen, projection" />
+		<script
+			src="http://maps.google.com/maps/api/js?key=AIzaSyDVWHGboo_npF2t3jEFeIwDF7o_DOhp91o"
+			type="text/javascript"></script>
+	</h:head>
+	<h:body styleClass="bodyStyle">
+		<div id="header" style="width: 100%;">
+			<ui:insert name="header">
+				<ui:include src="/templates/header.xhtml" />
+			</ui:insert>
+		</div>
+
+		<p:growl id="growl" />
+
+		<div class="container newContent">
+			<div class="newContent">
+				<h:form id="newContentForm" enctype="multipart/form-data">
+					<h:panelGrid id="newContentPanel" columns="1">
+						<p:outputLabel id="newContentLabel"
+							value="#{msgs['dashboard.newContent.label']}" />
+						<p:fileUpload id="fileSelectButton"
+							label="#{msgs['dashboard.button.fileSelect']}"
+							value="#{dashboardBean.selectedFile}" mode="simple"
+							skinSimple="true" fileLimit="1" required="true"
+							allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
+						<p:panelGrid columns="1" styleClass="newContentCategoryGrid">
+							<p:outputLabel value="#{msgs['dashboard.newContent.category']}" />
+							<p:selectOneMenu required="true"
+								styleClass="selectOneMenuBackground"
+								panelStyleClass="selectOneMenuBackgroundPanel"
+								requiredMessage="#{msgs['dashboard.newContent.category.required']}"
+								label="#{msgs['dashboard.newContent.category']}"
+								value="#{dashboardBean.contentCategory}">
+								<f:selectItems value="#{dashboardBean.categories}" />
+							</p:selectOneMenu>
+						</p:panelGrid>
+						<p:watermark for="newContentInput"
+							value="#{msgs['dashboard.newContent.description']}"
+							id="watermark" />
+						<p:inputTextarea id="newContentInput"
+							value="#{dashboardBean.contentDescription}" cols="5"
+							styleClass="newContentInput" />
+						<p:commandButton id="shareButton" styleClass="loginButton"
+							value="#{msgs['dashboard.button.share']}"
+							process="newContentForm" action="#{dashboardBean.share}"
+							ajax="false" update=":growl :dataList" />
+					</h:panelGrid>
+				</h:form>
+			</div>
+
+			<h:form id="filterForm">
+				<div class="container filterContent">
+					<div class="filterContent">
+						<p:panelGrid id="fiterPanelGrid" columns="1"
+							styleClass="gridPanelNoBorder">
+							<p:selectManyCheckbox id="custom"
+								value="#{dashboardBean.selectedCategories}" layout="custom">
+								<f:selectItem
+									itemLabel="#{msgs['dashboard.newContent.category.SHIT']}"
+									itemValue="S" />
+								<f:selectItem
+									itemLabel="#{msgs['dashboard.newContent.category.EAT']}"
+									itemValue="E" />
+								<f:selectItem
+									itemLabel="#{msgs['dashboard.newContent.category.DRINK']}"
+									itemValue="D" />
+								<f:selectItem
+									itemLabel="#{msgs['dashboard.newContent.category.WEED']}"
+									itemValue="W" />
+							</p:selectManyCheckbox>
+							<p:panelGrid id="categoryPanel" columns="4"
+								styleClass="gridPanelNoBorder">
+								<p:outputPanel>
+									<p:graphicImage value="images/shit.png" width="75px" />
+									<p:checkbox id="opt1" for="custom" itemIndex="0"
+										style="display:block" />
+								</p:outputPanel>
+								<p:outputPanel>
+									<p:graphicImage value="images/eat.png" width="75px" />
+									<p:checkbox id="opt2" for="custom" itemIndex="1"
+										style="display:block" />
+								</p:outputPanel>
+								<p:outputPanel>
+									<p:graphicImage value="images/drink.png" width="75px" />
+									<p:checkbox id="opt3" for="custom" itemIndex="2"
+										style="display:block" />
+								</p:outputPanel>
+								<p:outputPanel>
+									<p:graphicImage value="images/weed.png" width="75px" />
+									<p:checkbox id="opt4" for="custom" itemIndex="3"
+										style="display:block" />
+								</p:outputPanel>
+							</p:panelGrid>
+						</p:panelGrid>
+					</div>
+					<div class="filterContent2">
+						<p:panelGrid columns="2" styleClass="gridPanelNoBorder">
+							<p:panelGrid columns="2" styleClass="gridPanelNoBorder">
+								<p:outputLabel value="#{msgs['dashboard.filter.sharedBy']}">
+								</p:outputLabel>
+								<p:selectOneMenu value="#{dashboardBean.filter.sharedBy}"
+									styleClass="selectOneMenuBackground"
+									panelStyleClass="selectOneMenuBackgroundPanel">
+									<f:selectItem noSelectionOption="true" />
+									<f:selectItems value="#{dashboardBean.users}"></f:selectItems>
+								</p:selectOneMenu>
+							</p:panelGrid>
+							<p:panelGrid columns="5" styleClass="gridPanelNoBorder">
+								<p:outputLabel value="#{msgs['dashboard.filter.date']}" />
+								<p:calendar readonlyInput="true" navigator="true" locale="tr"
+									pattern="dd.MM.yyyy" value="#{dashboardBean.filter.dateFrom}"
+									styleClass="filterCalendar">
+								</p:calendar>
+								<p:outputLabel value="#{msgs['dashboard.filter.date.from']}" />
+								<p:calendar readonlyInput="true" navigator="true" locale="tr"
+									pattern="dd.MM.yyyy" value="#{dashboardBean.filter.dateUntil}"
+									styleClass="filterCalendar">
+								</p:calendar>
+								<p:outputLabel value="#{msgs['dashboard.filter.date.until']}" />
+							</p:panelGrid>
+						</p:panelGrid>
+					</div>
+					<div class="filterContent3">
+						<p:panelGrid columns="2" styleClass="gridPanelNoBorder">
+							<p:outputLabel value="#{msgs['dashboard.filter.orderBy']}">
+							</p:outputLabel>
+							<p:selectOneMenu value="#{dashboardBean.filter.orderBy}"
+								styleClass="selectOneMenuBackground"
+								panelStyleClass="selectOneMenuBackgroundPanel">
+								<f:selectItem noSelectionOption="true" />
+								<f:selectItems value="#{dashboardBean.orderByValues}"></f:selectItems>
+							</p:selectOneMenu>
+						</p:panelGrid>
+					</div>
+					<p:commandButton id="filterButton" styleClass="filterButton"
+						value="#{msgs['dashboard.button.filter']}" process="filterForm"
+						action="#{dashboardBean.filter}" update=":growl :dataList" />
+					<p:spacer width="20"/>
+					<p:commandButton id="cleanButton" styleClass="filterButton"
+						value="#{msgs['dashboard.button.reset']}" process="filterForm"
+						action="#{dashboardBean.reset}" update=":growl :dataList" />
+				</div>
+			</h:form>
+
+			<div class="container feed">
+				<p:dataTable id="dataList" var="photo" widgetVar="photoList"
+					value="#{dashboardBean.elements}" paginatorPosition="bottom"
+					emptyMessage="#{msgs['dashboard.noRecordsFound']}"
+					selectionMode="single"
+					selection="#{dashboardBean.selectedElements}" paginator="true"
+					paginatorAlwaysVisible="false" rows="25" pageLinks="5"
+					paginatorTemplate="#{dashboardBean.paginatorTemplate}"
+					rowsPerPageTemplate="#{dashboardBean.rowsPerPageTemplate}"
+					rowKey="#{photo.id}" styleClass="borderless">
+
+					<p:ajax event="rowSelect" listener="#{dashboardBean.onRowSelect}"
+						global="false" />
+					<p:ajax event="rowUnselect"
+						listener="#{dashboardBean.onRowUnselect}" global="false" />
+					<p:ajax event="filter" global="false" />
+					<p:ajax event="sort" global="false" />
+
+					<p:column>
+						<p:panelGrid columns="1" styleClass="contentGrid">
+							<p:outputPanel styleClass="contentTopPanel">
+								<p:panelGrid columns="2" styleClass="contentGrid"
+									columnClasses="forty-percent, sixty-percent">
+									<p:panelGrid columns="2" styleClass="contentNameGrid"
+										columnClasses="twenty-percent, eighty-percent">
+										<p:graphicImage value="#{imageBean.profileImage}" width="50px">
+											<f:param name="userId" value="#{photo.content.systemUser.id}" />
+											<f:param name="profilePhotoFileName"
+												value="#{photo.content.systemUser.profilePhoto}" />
+										</p:graphicImage>
+										<p:panelGrid columns="2" styleClass="contentGridTop">
+											<h:outputLabel style="color: #0A9656;"
+												value="#{photo.content.systemUser.firstname} #{photo.content.systemUser.lastname}" />
+											<p:tooltip id="contentTimeAgoTooltip" for="contentTimeAgo"
+												value="#{dashboardBean.getTime(photo.content.createTimestamp)}"
+												trackMouse="true" />
+											<h:outputLabel id="contentTimeAgo"
+												style="font-size: 15px;color: #0A9656;"
+												value="#{dashboardBean.getTimeAgo(photo.content.createTimestamp)}" />
+										</p:panelGrid>
+									</p:panelGrid>
+									<p:graphicImage
+										value="#{dashboardBean.getCategoryImage(photo.content.category)}"
+										width="75px" style="float: right;" />
+								</p:panelGrid>
+							</p:outputPanel>
+							<p:outputPanel id="descriptionPanel"
+								rendered="#{photo.content.description ne null}"
+								style="padding-bottom: 30px;">
+								<h:form id="mapForm">
+									<p:commandLink id="mapButton"
+										rendered="#{photo.latitude ne null and photo.longitude ne null}"
+										action="#{dashboardBean.showGeoLocation(photo)}"
+										oncomplete="PF('mapDialog').show();" process="mapForm"
+										update=":googleMap"
+										style="float: left;padding-bottom: 10px;padding-left: 10px;">
+										<h:graphicImage value="images/map.png" width="25px" />
+									</p:commandLink>
+								</h:form>
+								<h:outputText value="#{photo.content.description}"
+									style="padding-left: 10px; display: block; font-size: 20px; float: left;" />
+							</p:outputPanel>
+							<p:outputPanel style="width: auto; background: #000;">
+								<p:graphicImage value="#{imageBean.image}"
+									style="min-width:300px; padding-top:5px">
+									<f:param name="fileName" value="#{photo.fileName}" />
+								</p:graphicImage>
+							</p:outputPanel>
+							<p:outputPanel id="likePanel"
+								rendered="#{not empty photo.content.userLikes or not empty photo.content.userRatings}"
+								style="padding-top: 20px;">
+								<h:outputText value="#{dashboardBean.getLikes(photo)}"
+									style="padding-left: 10px; display: block; font-size: 16px; float: left;" />
+								<h:outputText value="#{dashboardBean.getRatings(photo)}"
+									style="padding-left: 10px; display: block; font-size: 16px; float: right;" />
+							</p:outputPanel>
+							<h:form id="likeRateForm">
+								<p:outputPanel style="padding: 10px;">
+									<p:commandLink id="likeButton"
+										action="#{dashboardBean.like(photo)}" process="likeRateForm"
+										global="true" disabled="#{dashboardBean.likeEnabled(photo)}"
+										update=":growl :dataList">
+										<h:graphicImage value="images/like.png" width="50px" />
+									</p:commandLink>
+									<p:spacer width="50px" />
+									<p:commandLink id="rateButton"
+										disabled="#{dashboardBean.rateEnabled(photo)}"
+										action="#{dashboardBean.setCurrentPhoto(photo)}"
+										update=":mapDialog :rateForm:rateDialog" oncomplete="PF('rateDialog').show()"
+										process="likeRateForm" global="true">
+										<h:graphicImage value="images/rate.png" width="45px" />
+									</p:commandLink>
+								</p:outputPanel>
+							</h:form>
+							<p:outputPanel id="commentPanel"
+								rendered="#{not empty photo.content.userComments}"
+								style="padding-left: 25px;">
+								<p:dataList id="commentList" type="definition"
+									value="#{photo.content.userComments}" var="comment">
+									<p:panelGrid columns="2" styleClass="commentGrid"
+										columnClasses="twenty-percent, eighty-percent">
+										<p:panelGrid columns="1" styleClass="commentGrid">
+											<p:outputPanel>
+												<p:graphicImage value="#{imageBean.profileImage}"
+													width="30px" style="vertical-align: middle;">
+													<f:param name="profilePhotoFileName"
+														value="#{comment.systemUser.profilePhoto}" />
+												</p:graphicImage>
+												<p:outputLabel
+													style="padding-left: 5px;vertical-align: middle; font-size: 15px;color: #A95B17;"
+													value="#{comment.systemUser.firstname} #{comment.systemUser.lastname}" />
+											</p:outputPanel>
+											<p:outputLabel style="font-size: 10px;color: #A95B17;"
+												value="#{dashboardBean.getTimeAgo(comment.createTimestamp)}" />
+										</p:panelGrid>
+										<h:outputText value="#{comment.comment}"
+											style="padding-left: 10px; display: block; font-size: 15px;" />
+									</p:panelGrid>
+									<hr
+										style="width: 900px; height: 1px; background: #F1BC96; border: none;" />
+								</p:dataList>
+							</p:outputPanel>
+							<h:form id="commentForm" style="padding-left: 25px;">
+								<p:panelGrid id="newCommentPanel" columns="2"
+									styleClass="commentGrid"
+									columnClasses="eightyfive-percent, fifteen-percent">
+									<p:outputPanel>
+										<p:inputTextarea id="newCommentInput"
+											value="#{dashboardBean.comment}" cols="3"
+											styleClass="newCommentInput" />
+										<p:watermark for="newCommentInput"
+											value="#{msgs['dashboard.newComment.comment']}"
+											id="watermarkComment" />
+									</p:outputPanel>
+									<p:commandButton id="commentButton" styleClass="loginButton"
+										value="#{msgs['dashboard.button.comment']}"
+										action="#{dashboardBean.comment(photo)}" process="commentForm"
+										update=":growl :dataList" />
+								</p:panelGrid>
+							</h:form>
+						</p:panelGrid>
+					</p:column>
+				</p:dataTable>
+			</div>
+		</div>
+
+
+		<h:form id="rateForm">
+			<p:outputPanel>
+				<p:dialog id="rateDialog" widgetVar="rateDialog" modal="true"
+					width="300px" header="#{msgs['dashboard.rate.dialog.header']}"
+					style="background-color: beige;">
+					<div
+						style="text-align: center; vertical-align: middle; white-space: pre-wrap;">
+						<p:outputLabel value="#{msgs['dashboard.rate.dialog.rating']}"
+							style="padding-right: 20px;" />
+						<p:selectOneMenu required="true" value="#{dashboardBean.rating}"
+							styleClass="selectOneMenuBackground"
+							panelStyleClass="selectOneMenuBackgroundPanel"
+							label="#{msgs['dashboard.rate.dialog.rating']}">
+							<f:selectItem itemLabel="" itemValue="0" noSelectionOption="true" />
+							<f:selectItem itemLabel="5" itemValue="5" />
+							<f:selectItem itemLabel="4" itemValue="4" />
+							<f:selectItem itemLabel="3" itemValue="3" />
+							<f:selectItem itemLabel="2" itemValue="2" />
+							<f:selectItem itemLabel="1" itemValue="1" />
+						</p:selectOneMenu>
+					</div>
+					<p:panelGrid columns="2" styleClass="gridPanelNoBorder">
+						<p:commandButton id="proceedButton" styleClass="loginButton"
+							value="#{msgs['dashboard.rate.dialog.rateButton']}"
+							action="#{dashboardBean.rate}" update=":growl :dataList"
+							oncomplete="handleRateDialogComplete(xhr, status, args);" />
+						<p:commandButton id="cancelButton" styleClass="loginButton"
+							value="#{msgs['dashboard.rate.dialog.cancelButton']}"
+							label="#{msgs['dashboard.rate.dialog.cancelButton']}"
+							onclick="PF('rateDialog').hide();" />
+					</p:panelGrid>
+
+				</p:dialog>
+			</p:outputPanel>
+		</h:form>
+
+		<p:outputPanel>
+			<p:dialog id="mapDialog" widgetVar="mapDialog" modal="true"
+				width="800px" height="600px"
+				header="#{msgs['dashboard.map.dialog.header']}"
+				style="background-color: beige;">
+				<div>
+					<f:view contentType="text/html">
+						<p:gmap id="googleMap" zoom="13" type="roadmap" scrollWheel="true"
+							style="width:100%;height:600px"
+							center="#{dashboardBean.mapCenter}"
+							model="#{dashboardBean.mapModel}" />
+					</f:view>
+				</div>
+			</p:dialog>
+		</p:outputPanel>
+
+		<script type="text/javascript">
+			function handleRateDialogComplete(xhr, status, args) {
+				if (!(args.actionFailed || args.validationFailed)) {
+					PF('rateDialog').hide();
+				}
+				return false;
+			}
+		</script>
+	</h:body>
+</f:view>
+</html>

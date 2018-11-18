@@ -1,0 +1,252 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.7"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.7
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.7.xsd">
+	<changeSet id="0.0.001" author="yunus.evren">
+		<createTable tableName="system_user">
+			<column autoIncrement="true" name="id" type="serial">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="pk_system_user_id" />
+			</column>
+			<column name="username" type="VARCHAR(50)">
+				<constraints nullable="false" />
+			</column>
+			<column name="password" type="VARCHAR(50)" />
+			<column name="email" type="VARCHAR(50)">
+				<constraints nullable="false" />
+			</column>
+			<column name="firstname" type="VARCHAR(50)">
+				<constraints nullable="false" />
+			</column>
+			<column name="lastname" type="VARCHAR(50)">
+				<constraints nullable="false" />
+			</column>
+			<column name="create_timestamp" type="timestamp">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="0.0.002" author="yunus.evren">
+		<createTable tableName="content">
+			<column autoIncrement="true" name="id" type="serial">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="pk_content_id" />
+			</column>
+			<column name="system_user_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="create_timestamp" type="timestamp">
+				<constraints nullable="false" />
+			</column>
+			<column name="title" type="VARCHAR(100)" />
+			<column name="description" type="TEXT" />
+			<column name="category" type="VARCHAR(2)">
+				<constraints nullable="false" />
+			</column>
+			<column name="type" type="VARCHAR(2)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<addForeignKeyConstraint constraintName="fk_content_system_user_id"
+			deferrable="false" initiallyDeferred="false" baseTableSchemaName="public"
+			baseTableName="content" baseColumnNames="system_user_id"
+			referencedTableSchemaName="public" referencedTableName="system_user"
+			referencedColumnNames="id" />
+	</changeSet>
+
+	<changeSet id="0.0.003" author="yunus.evren">
+		<createTable tableName="photo">
+			<column autoIncrement="true" name="id" type="serial">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="pk_photo_id" />
+			</column>
+			<column name="content_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="date_taken" type="timestamp" />
+			<column name="latitude" type="numeric(9,6)"
+				defaultValueNumeric="0.000000" />
+			<column name="longitude" type="numeric(9,6)"
+				defaultValueNumeric="0.000000" />
+			<column name="file_name" type="VARCHAR(100)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<addForeignKeyConstraint constraintName="fk_photo_content_id"
+			deferrable="false" initiallyDeferred="false" baseTableSchemaName="public"
+			baseTableName="photo" baseColumnNames="content_id"
+			referencedTableSchemaName="public" referencedTableName="content"
+			referencedColumnNames="id" />
+	</changeSet>
+
+	<changeSet id="0.0.004" author="yunus.evren">
+		<createTable tableName="movie">
+			<column autoIncrement="true" name="id" type="serial">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="pk_movie_id" />
+			</column>
+			<column name="content_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="title" type="VARCHAR(75)">
+				<constraints nullable="false" />
+			</column>
+			<column name="year" type="smallint" />
+			<column name="runtime" type="smallint" />
+			<column name="director" type="VARCHAR(50)" />
+			<column name="actors" type="VARCHAR(100)" />
+			<column name="language" type="VARCHAR(50)" />
+			<column name="plot" type="TEXT" />
+			<column name="poster_url" type="VARCHAR(255)" />
+			<column name="country" type="VARCHAR(100)" />
+			<column name="imdb_reference" type="VARCHAR(12)" />
+			<column name="imdb_rating" type="double" />
+			<column name="imdb_votes" type="int4" />
+		</createTable>
+		<addForeignKeyConstraint constraintName="fk_movie_content_id"
+			deferrable="false" initiallyDeferred="false" baseTableSchemaName="public"
+			baseTableName="movie" baseColumnNames="content_id"
+			referencedTableSchemaName="public" referencedTableName="content"
+			referencedColumnNames="id" />
+	</changeSet>
+	
+	<changeSet id="0.0.005" author="yunus.evren">
+		<createTable tableName="movie_genre">
+			<column autoIncrement="true" name="id" type="serial">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="pk_movie_genre_id" />
+			</column>
+			<column name="movie_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="genre" type="VARCHAR(2)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<addForeignKeyConstraint constraintName="fk_movie_genre_movie_id"
+			deferrable="false" initiallyDeferred="false" baseTableSchemaName="public"
+			baseTableName="movie_genre" baseColumnNames="movie_id"
+			referencedTableSchemaName="public" referencedTableName="movie"
+			referencedColumnNames="id" />
+		<sql>
+			DROP INDEX IF EXISTS idx_movie_genre;
+			CREATE INDEX idx_movie_genre ON movie_genre (genre);
+		</sql>
+		<rollback>
+			<sql>
+				DROP INDEX IF EXISTS idx_movie_genre;
+			</sql>
+			<dropTable tableName="movie_genre"/>
+		</rollback>
+	</changeSet>
+	
+	<changeSet id="0.0.006" author="yunus.evren">
+		<createTable tableName="user_comment">
+			<column autoIncrement="true" name="id" type="serial">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="pk_user_comment_id" />
+			</column>
+			<column name="system_user_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="content_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="create_timestamp" type="timestamp">
+				<constraints nullable="false" />
+			</column>
+			<column name="comment" type="TEXT">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<addForeignKeyConstraint constraintName="fk_user_comment_system_user_id"
+			deferrable="false" initiallyDeferred="false" baseTableSchemaName="public"
+			baseTableName="user_comment" baseColumnNames="system_user_id"
+			referencedTableSchemaName="public" referencedTableName="system_user"
+			referencedColumnNames="id" />
+		<addForeignKeyConstraint constraintName="fk_user_comment_content_id"
+			deferrable="false" initiallyDeferred="false" baseTableSchemaName="public"
+			baseTableName="user_comment" baseColumnNames="content_id"
+			referencedTableSchemaName="public" referencedTableName="content"
+			referencedColumnNames="id" />
+	</changeSet>
+	
+	<changeSet id="0.0.007" author="yunus.evren">
+		<createTable tableName="user_rating">
+			<column autoIncrement="true" name="id" type="serial">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="pk_user_rating_id" />
+			</column>
+			<column name="system_user_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="content_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="create_timestamp" type="timestamp">
+				<constraints nullable="false" />
+			</column>
+			<column name="rating" type="double">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<addForeignKeyConstraint constraintName="fk_user_rating_system_user_id"
+			deferrable="false" initiallyDeferred="false" baseTableSchemaName="public"
+			baseTableName="user_rating" baseColumnNames="system_user_id"
+			referencedTableSchemaName="public" referencedTableName="system_user"
+			referencedColumnNames="id" />
+		<addForeignKeyConstraint constraintName="fk_user_rating_content_id"
+			deferrable="false" initiallyDeferred="false" baseTableSchemaName="public"
+			baseTableName="user_rating" baseColumnNames="content_id"
+			referencedTableSchemaName="public" referencedTableName="content"
+			referencedColumnNames="id" />
+	</changeSet>
+	
+	<changeSet id="0.0.008" author="yunus.evren">
+		<addColumn tableName="system_user">
+			<column name="profile_photo" type="VARCHAR(100)" />
+		</addColumn>
+	</changeSet>
+	
+	<changeSet id="0.0.009" author="yunus.evren">
+		<createTable tableName="user_like">
+			<column autoIncrement="true" name="id" type="serial">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="pk_user_like_id" />
+			</column>
+			<column name="system_user_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="content_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="create_timestamp" type="timestamp">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<addForeignKeyConstraint constraintName="fk_user_like_system_user_id"
+			deferrable="false" initiallyDeferred="false" baseTableSchemaName="public"
+			baseTableName="user_like" baseColumnNames="system_user_id"
+			referencedTableSchemaName="public" referencedTableName="system_user"
+			referencedColumnNames="id" />
+		<addForeignKeyConstraint constraintName="fk_user_like_content_id"
+			deferrable="false" initiallyDeferred="false" baseTableSchemaName="public"
+			baseTableName="user_like" baseColumnNames="content_id"
+			referencedTableSchemaName="public" referencedTableName="content"
+			referencedColumnNames="id" />
+	</changeSet>
+	
+	<changeSet id="0.0.010" author="yunus.evren">
+		<addColumn tableName="system_user">
+			<column name="active" type="boolean" defaultValueBoolean="true">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+	
+	<changeSet id="0.0.011" author="yunus.evren">
+		<dropNotNullConstraint tableName="content" columnName="category" />
+	</changeSet>
+
+</databaseChangeLog>

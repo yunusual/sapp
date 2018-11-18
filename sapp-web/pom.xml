@@ -1,9 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+        <groupId>com.cribcaged</groupId>
+        <artifactId>sapp</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.cribcaged</groupId>
 	<artifactId>sapp-web</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>sapp-web</name>
 	<description>sApp web layer project</description>
@@ -38,6 +42,12 @@
 			<groupId>com.cribcaged</groupId>
 			<artifactId>sapp-persistence</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>7.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.faces</groupId>
